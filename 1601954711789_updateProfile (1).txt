@@ -1,0 +1,20 @@
+
+
+trigger updateProfile on Account(after insert,after update)
+{
+  List<Contact> lac =new List<Contact>([SELECT Id,FirstName,LastName,AccountId FROM Contact WHERE AccountId IN : Trigger.new]);
+Map<Id,Account> mapAccount = new Map<Id,Account>([SELECT Id,website FROM Account WHERE Id IN : Trigger.new]);
+if(Trigger.isInsert || Trigger.isUpdate && Trigger.isAfter)
+  {
+    for(Contact obj :lac)
+   {
+Account objAccount = mapAccount.get(obj.AccountId);
+    if(obj.FirstName != NULL){
+String strFirstName=obj.FirstName.substring(0,1);
+obj.Profile__c =objAccount.Website + '/' +strFirstName + obj.LastName;
+}
+              }
+if(lac.size() >0)
+upsert lac;
+}
+}
